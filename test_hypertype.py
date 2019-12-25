@@ -59,3 +59,8 @@ def test_one_of():
     assert Value.valid([1, 2])
     assert not Value.valid("foo")
     assert not Value.valid(["a", "b"])
+
+def test_literal():
+    Plus = Literal("+")
+    assert Plus.valid("+")
+    assert not Plus.valid("foo")

@@ -36,6 +36,22 @@ class AnyType(BaseType):
     def __repr__(self):
         return "Any"
 
+class Literal(BaseType):
+    """Type class to match a literal value.
+
+        Plus = Literal("+")
+        print(Plus.valid("+")) // True
+    """
+    def __init__(self, value, label=None):
+        self.value = value
+        self.label = label
+
+    def valid(self, value):
+        return self.value == value
+
+    def __repr__(self):
+        return self.label or "<{}>".format(self.value)
+
 class List(BaseType):
     """Type class to represent a list of values.
 
