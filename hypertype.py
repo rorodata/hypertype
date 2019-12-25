@@ -9,6 +9,9 @@ class BaseType:
     def valid(self, value):
         raise NotImplementedError()
 
+    def __or__(self, other):
+        return OneOf([self, other])
+
 class Type(BaseType):
     def __init__(self, type_, label=None):
         self.type_ = type_
@@ -47,6 +50,19 @@ class Record(BaseType):
 
     def __repr__(self):
         return "Record({})".format(self.schema)
+
+class OneOf(BaseType):
+    def __init__(self, nodes):
+        self.nodes = nodes
+
+    def valid(self, value):
+        return any(n.valid(value) for n in self.nodes)
+
+    def __or__(self, other):
+        return OneOf(self.nodes + [other])
+
+    def __repr__(self):
+        return " | ".join(str(n) for n in self.nodes)
 
 String = Type(str, label="String")
 Integer = Type(int, label="Integer")

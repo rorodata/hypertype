@@ -52,3 +52,10 @@ def test_record():
         "age": 42,
         "phone_numbers": "123-456-7890"
     })
+
+def test_one_of():
+    Value = Integer | List(Integer)
+    assert Value.valid(1)
+    assert Value.valid([1, 2])
+    assert not Value.valid("foo")
+    assert not Value.valid(["a", "b"])
