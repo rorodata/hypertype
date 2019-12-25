@@ -30,3 +30,25 @@ def test_list():
     assert Names.valid([])
     assert Names.valid(["a", "b"])
     assert not Names.valid(["a", "b", 3])
+
+def test_record():
+    Person = Record({
+        "name": String,
+        "age": Integer,
+        "phone_numbers": List(String)
+    })
+    assert Person.valid({
+        "name": "Alice",
+        "age": 42,
+        "phone_numbers": ["123-456-7890", "123-456-7891"]
+    })
+    assert not Person.valid("Alice")
+    assert not Person.valid({
+        "name": "Alice",
+        "age": 42
+    })
+    assert not Person.valid({
+        "name": "Alice",
+        "age": 42,
+        "phone_numbers": "123-456-7890"
+    })
