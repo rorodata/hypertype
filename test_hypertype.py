@@ -64,3 +64,22 @@ def test_literal():
     Plus = Literal("+")
     assert Plus.valid("+")
     assert not Plus.valid("foo")
+
+def test_reference():
+    BinOp = Literal("+") | Literal("*")
+    Expr = Reference()
+    Expr.set(
+        Integer
+        | Record({"left": Expr, "op": BinOp, "right": Expr})
+        )
+
+    assert Expr.valid(1)
+    assert Expr.valid({"left": 1, "op": "+", "right": 2})
+    assert Expr.valid({
+        "left": 1,
+        "op": "+",
+        "right": {
+            "left": 2,
+            "op": "*",
+            "right": 3
+        }})

@@ -105,6 +105,49 @@ class OneOf(BaseType):
     def __repr__(self):
         return " | ".join(str(t) for t in self.types)
 
+class Reference(BaseType):
+    """The Reference represents a Forward Reference to a type.
+
+    When defining types for recursive data structures, it is
+    required to use the type in defining itself. In Python, it
+    wouldn't be possible to it that and way and Reference solves
+    that issues.
+
+        BinOp = Literal("+") | Literal("*")
+        Expr = Reference()
+        Expr.set(
+            Integer
+            | Record({"left": Expr, "op": BinOp, "right": Expr})
+            )
+
+        print(Expr.valid(1)) # True
+        print(Expr.valid({"left": 1, "op": "+", "right": 2})) # True
+        print(Expr.valid({
+            "left": 1,
+            "op": "+",
+            "right": {
+                "left": 2,
+                "op": "*",
+                "right": 3
+            }})) # True
+    """
+    def __init__(self):
+        self.node = None
+
+    def set(self, node):
+        self.node = node
+
+    def valid(self, value):
+        if not self.node:
+            raise Exception("Undefined Reference")
+        return self.node.valid(value)
+
+    def __repr__(self):
+        if self.node:
+            return repr(self.node)
+        else:
+            return "Reference()"
+
 String = SimpleType(str, label="String")
 Integer = SimpleType(int, label="Integer")
 Float = SimpleType(float, label="Float")
