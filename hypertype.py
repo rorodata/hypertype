@@ -2,7 +2,7 @@
 (↑t) - hypertype
 ~~~~~~~~~~~~~~~~
 
-Haskell inspired type classes and pattern matching for Python.
+Haskell inspired type system and pattern matching for Python.
 """
 import inspect
 
