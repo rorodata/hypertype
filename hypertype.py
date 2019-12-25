@@ -40,7 +40,7 @@ class Literal(BaseType):
     """Type class to match a literal value.
 
         Plus = Literal("+")
-        print(Plus.valid("+")) // True
+        print(Plus.valid("+")) # True
     """
     def __init__(self, value, label=None):
         self.value = value
@@ -74,7 +74,7 @@ class Tuple(BaseType):
     """Tuple represents is a fixed length record.
 
         Point = Tuple([Integer, Integer])
-        Point.valid([1, 2]) // True
+        Point.valid([1, 2]) # True
     """
     def __init__(self, *types):
         self.types = types
@@ -91,7 +91,26 @@ class Record(BaseType):
     """Type class to represent a record with fixed keys.
 
         Point = Record({"x": Integer, "y": Integer})
-        print(Point.valid({"x": 1, "y": 2})) // True
+        print(Point.valid({"x": 1, "y": 2})) # True
+    """
+    def __init__(self, schema):
+        self.schema = schema
+
+    def valid(self, value):
+        return isinstance(value, dict) \
+            and all(k in value and type_.valid(value[k]) for k, type_ in self.schema.items())
+
+    def __repr__(self):
+        return "Record({})".format(self.schema)
+
+class Dict(BaseType):
+    """Type class to represent homogeneous key-value pairs.
+
+        PriceList = Dict(String, Float)
+        PriceList.valid({
+            "apple": 10.0,
+            "mango": 10.0,
+        }) // True
     """
     def __init__(self, schema):
         self.schema = schema

@@ -59,6 +59,16 @@ def test_record():
         "phone_numbers": "123-456-7890"
     })
 
+
+def type_dict():
+    PriceList = Dict(String, Float)
+    assert PriceList.valid({})
+    assert PriceList.valid({
+        "apple": 10.0,
+        "mango": 10.0,
+    })
+    assert not PriceList.valid({"apple": "x"})
+
 def test_one_of():
     Value = Integer | List(Integer)
     assert Value.valid(1)
