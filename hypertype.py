@@ -6,13 +6,17 @@ Haskell inspired type classes and pattern matching for Python.
 """
 
 class BaseType:
+    """Base class for all types.
+    """
     def valid(self, value):
         raise NotImplementedError()
 
     def __or__(self, other):
         return OneOf([self, other])
 
-class Type(BaseType):
+class SimpleType(BaseType):
+    """Type class to the simple types like string, integer etc.
+    """
     def __init__(self, type_, label=None):
         self.type_ = type_
         self.label = label or str(type_)
@@ -24,6 +28,8 @@ class Type(BaseType):
         return self.label
 
 class AnyType(BaseType):
+    """Type class to match any value.
+    """
     def valid(self, value):
         return True
 
@@ -31,16 +37,29 @@ class AnyType(BaseType):
         return "Any"
 
 class List(BaseType):
-    def __init__(self, node):
-        self.node = node
+    """Type class to represent a list of values.
+
+    List is a homogeneous collection and each element of
+    the collection must be of the specified type.
+
+        Numbers = List(Integer)
+        print(Numbers.valid([1, 2, 3]) # True
+    """
+    def __init__(self, type_):
+        self.type_ = type_
 
     def valid(self, value):
-        return isinstance(value, list) and all(self.node.valid(v) for v in value)
+        return isinstance(value, list) and all(self.type_.valid(v) for v in value)
 
     def __repr__(self):
-        return "List({})".format(self.node)
+        return "List({})".format(self.type_)
 
 class Record(BaseType):
+    """Type class to represent a record with fixed keys.
+
+        Point = Record({"x": Integer, "y": Integer})
+        print(Point.valid({"x": 1, "y": 2})) // True
+    """
     def __init__(self, schema):
         self.schema = schema
 
@@ -52,21 +71,27 @@ class Record(BaseType):
         return "Record({})".format(self.schema)
 
 class OneOf(BaseType):
-    def __init__(self, nodes):
-        self.nodes = nodes
+    """Type class to match one of the given types.
+
+        Value = Integer | List[Integer]
+        print(Value.valid(1)) # True
+        print(Value.valid([1, 2, 3])) # True
+    """
+    def __init__(self, types):
+        self.types = types
 
     def valid(self, value):
-        return any(n.valid(value) for n in self.nodes)
+        return any(t.valid(value) for t in self.types)
 
     def __or__(self, other):
-        return OneOf(self.nodes + [other])
+        return OneOf(self.types + [other])
 
     def __repr__(self):
-        return " | ".join(str(n) for n in self.nodes)
+        return " | ".join(str(t) for t in self.types)
 
-String = Type(str, label="String")
-Integer = Type(int, label="Integer")
-Float = Type(float, label="Float")
-Boolean = Type(bool, label="Boolean")
-Nothing = Type(type(None), label="Nothing")
+String = SimpleType(str, label="String")
+Integer = SimpleType(int, label="Integer")
+Float = SimpleType(float, label="Float")
+Boolean = SimpleType(bool, label="Boolean")
+Nothing = SimpleType(type(None), label="Nothing")
 Any = AnyType()
