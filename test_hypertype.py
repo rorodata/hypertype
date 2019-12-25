@@ -24,3 +24,9 @@ def test_simple_types():
     assert Any.valid(1)
     assert Any.valid(3.14)
     assert Any.valid(False)
+
+def test_list():
+    Names = List(String)
+    assert Names.valid([])
+    assert Names.valid(["a", "b"])
+    assert not Names.valid(["a", "b", 3])

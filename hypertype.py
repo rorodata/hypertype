@@ -27,6 +27,16 @@ class AnyType(BaseType):
     def __repr__(self):
         return "Any"
 
+class List(BaseType):
+    def __init__(self, node):
+        self.node = node
+
+    def valid(self, value):
+        return isinstance(value, list) and all(self.node.valid(v) for v in value)
+
+    def __repr__(self):
+        return "List({})".format(self.node)
+
 String = Type(str, label="String")
 Integer = Type(int, label="Integer")
 Float = Type(float, label="Float")
