@@ -70,6 +70,23 @@ class List(BaseType):
     def __repr__(self):
         return "List({})".format(self.type_)
 
+class Tuple(BaseType):
+    """Tuple represents is a fixed length record.
+
+        Point = Tuple([Integer, Integer])
+        Point.valid([1, 2]) // True
+    """
+    def __init__(self, *types):
+        self.types = types
+
+    def valid(self, value):
+        return isinstance(value, (list, tuple)) \
+            and len(value) == len(self.types) \
+            and all(t.valid(v) for t, v in zip(self.types, value))
+
+    def __repr__(self):
+        return "Tuple({})".format(", ".join(str(t) for t in self.types))
+
 class Record(BaseType):
     """Type class to represent a record with fixed keys.
 

@@ -31,6 +31,12 @@ def test_list():
     assert Names.valid(["a", "b"])
     assert not Names.valid(["a", "b", 3])
 
+def test_tuple():
+    Point = Tuple(Integer, Integer)
+    assert Point.valid([1, 2]) is True
+    assert Point.valid([1, 2, 3]) is False
+    assert Point.valid([1, "a"]) is False
+
 def test_record():
     Person = Record({
         "name": String,
