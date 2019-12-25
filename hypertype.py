@@ -4,6 +4,7 @@
 
 Haskell inspired type classes and pattern matching for Python.
 """
+import inspect
 
 class BaseType:
     """Base class for all types.
@@ -190,3 +191,55 @@ Float = SimpleType(float, label="Float")
 Boolean = SimpleType(bool, label="Boolean")
 Nothing = SimpleType(type(None), label="Nothing")
 Any = AnyType()
+
+_methods = {}
+
+class MultiMethod:
+    """MultiMethod implements function polymorphism based on the
+    type of the data.
+
+    See the method decorator for more details.
+    """
+    def __init__(self, name):
+        self.name = name
+        self._methods = []
+
+    def add_method(self, method):
+        specs = inspect.getfullargspec(method)
+        if specs.varargs or specs.varargs or specs.kwonlyargs:
+            raise Exception("hyptertype methods supports only simple arguments. varargs, kwargs etc. are not supported.")
+
+        argtypes = [specs.annotations[a] for a in specs.args]
+        t = Tuple(*argtypes)
+        self._methods.append((t, method))
+
+    def __call__(self, *args):
+        for t, method in self._methods:
+            if t.valid(args):
+                return method(*args)
+        raise ValueError("Unable to find a matching method")
+
+def method(f):
+    """Decorator to mark a function as a hypertype method.
+
+    Hypertype method implements multiple-dispatch or function polymorphism
+    based on the type of the arguments. The types of the arguments are
+    specified using the function annotations.
+
+    This is some what like the pattern-matching in Haskell as we the types
+    are nothing but the shape of the data.
+
+        @method
+        def display(n Integer):
+            print(n, "is an integer")
+
+        @method
+        def display(s String):
+            print(s, "is a string")
+
+        display(42) # 42 is an integer
+        display("Magic") # Magic is a string
+    """
+    m = _methods.setdefault(f.__name__, MultiMethod(f.__name__))
+    m.add_method(f)
+    return m

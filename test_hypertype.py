@@ -99,3 +99,19 @@ def test_reference():
             "op": "*",
             "right": 3
         }})
+
+def test_method():
+    Value = Reference()
+    Value.set(Integer | List(Value))
+
+    @method
+    def total(value: Integer):
+        return value
+
+    @method
+    def total(value: List(Value)):
+        return sum(total(v) for v in value)
+
+    assert total(1) == 1
+    assert total([1, 2, 3, 4]) == 10
+    assert total([1, [2, 3], 4]) == 10
