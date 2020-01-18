@@ -1,20 +1,12 @@
 from hypertype import *
 
-Expr = Reference()
-AddExpr = Tuple(Literal("+"), Expr, Expr)
-SubExpr = Tuple(Literal("-"), Expr, Expr)
-MulExpr = Tuple(Literal("*"), Expr, Expr)
-DivExpr = Tuple(Literal("/"), Expr, Expr)
+Expr = Type()
+BinOp = Type()
 
-Expr.set(
-    Integer
-    | AddExpr
-    | SubExpr
-    | MulExpr
-    | DivExpr
-    )
+Expr >>= Integer | Tuple(BinOp, Expr, Expr)
+BinOp >>= Literal("+") | Literal("-") | Literal("*") | Literal("/")
 
-@method
+@method(Expr)
 def compute(expr: Integer):
     return expr
 
@@ -33,7 +25,6 @@ def compute(expr: MulExpr):
 @method
 def compute(expr: DivExpr):
     return compute(expr[1]) / compute(expr[2])
-
 
 e = ["+", 2, ["*", 3, 4]]
 print(compute(e))

@@ -1,7 +1,5 @@
 from hypertype import *
 
-Record = Dict
-
 Circle = Record({
     "type": Literal("circle"),
     "radius": Integer
