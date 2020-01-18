@@ -213,21 +213,37 @@ class MultiMethod:
     def __init__(self, name):
         self.name = name
         self._methods = []
+        self.nargs = -1
 
     def add_method(self, method):
         specs = inspect.getfullargspec(method)
         if specs.varargs or specs.varargs or specs.kwonlyargs:
             raise Exception("hyptertype methods supports only simple arguments. varargs, kwargs etc. are not supported.")
+        if self.nargs >= 0 and self.nargs != len(specs.args):
+            raise Exception(
+                "Method {} is expected to have {} args. Found {}.".format(
+                    self.name, self.nargs, len(specs.args)))
 
-        argtypes = [specs.annotations[a] for a in specs.args]
+        argtypes = [specs.annotations.get(a, Any) for a in specs.args]
         t = Tuple(*argtypes)
         self._methods.append((t, method))
+        self.nargs = len(specs.args)
 
     def __call__(self, *args):
+        if len(args) != self.nargs:
+            raise TypeError(
+                "method {} expects {} args, given {}".format(
+                    self.name,
+                    self.nargs,
+                    len(args)))
         for t, method in self._methods:
-            if t.valid(args):
+            valid = t.valid(args)
+            if valid:
                 return method(*args)
-        raise ValueError("Unable to find a matching method")
+        raise ValueError("Unable to find a matching method for {}".format(self.name))
+
+    def __repr__(self):
+        return "Method:{}".format(self.name)
 
 def method(f):
     """Decorator to mark a function as a hypertype method.
@@ -253,3 +269,11 @@ def method(f):
     m = _methods.setdefault(f.__name__, MultiMethod(f.__name__))
     m.add_method(f)
     return m
+
+def nested_apply(value, method):
+    if isinstance(value, list):
+        return [method(v) for v in value]
+    elif isinstance(value, dict):
+        return {k: method(v) for k, v in value.items()}
+    else:
+        return method(value)
