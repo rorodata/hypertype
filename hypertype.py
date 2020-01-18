@@ -168,20 +168,27 @@ class Reference(BaseType):
                 "right": 3
             }})) # True
     """
-    def __init__(self):
-        self.node = None
+    def __init__(self, label=None):
+        self.type_ = None
+        self.label = label
 
-    def set(self, node):
-        self.node = node
+    def set(self, type_):
+        self.type_ = type_
+
+    def __irshift__(self, type_):
+        self.type_ = type_
+        return self
 
     def valid(self, value):
-        if not self.node:
-            raise Exception("Undefined Reference")
-        return self.node.valid(value)
+        if not self.type_:
+            raise Exception("Undefined Reference: " + self.label or "<Unnamed>")
+        return self.type_.valid(value)
 
     def __repr__(self):
-        if self.node:
-            return repr(self.node)
+        if self.label:
+            return self.label
+        if self.type_:
+            return repr(self.type_)
         else:
             return "Reference()"
 
@@ -191,6 +198,9 @@ Float = SimpleType(float, label="Float")
 Boolean = SimpleType(bool, label="Boolean")
 Nothing = SimpleType(type(None), label="Nothing")
 Any = AnyType()
+
+# It is more natural to call it a Type when declaring it.
+Type = Reference
 
 _methods = {}
 
