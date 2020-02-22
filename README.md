@@ -2,7 +2,7 @@
 
 Haskell-inspired type system and pattern matching for Python.
 
-## Example
+## Examples
 
 ```
 from hypertype import *
@@ -40,3 +40,9 @@ r = {
 print(Shape.valid(c), Shape.valid(r))
 print(area(c), area(r))
 ```
+
+
+Checkout out [examples][] directory for more examples.
+
+[examples]: https://github.com/rorodata/hypertype/tree/master/examples
+
