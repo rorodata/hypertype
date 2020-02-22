@@ -6,25 +6,30 @@ BinOp = Type()
 Expr >>= Integer | Tuple(BinOp, Expr, Expr)
 BinOp >>= Literal("+") | Literal("-") | Literal("*") | Literal("/")
 
-@method(Expr)
+@method
 def compute(expr: Integer):
     return expr
 
 @method
-def compute(expr: AddExpr):
-    return compute(expr[1]) + compute(expr[2])
+def compute(expr: Tuple(BinOp, Expr, Expr)):
+    op, left, right = expr
+    return compute_op(op, left, right)
 
 @method
-def compute(expr: SubExpr):
-    return compute(expr[1]) - compute(expr[2])
+def compute_op(op: Literal("+"), left: Expr, right: Expr):
+    return compute(left) + compute(right)
 
 @method
-def compute(expr: MulExpr):
-    return compute(expr[1]) * compute(expr[2])
+def compute_op(op: Literal("-"), left: Expr, right: Expr):
+    return compute(left) - compute(right)
 
 @method
-def compute(expr: DivExpr):
-    return compute(expr[1]) / compute(expr[2])
+def compute_op(op: Literal("*"), left: Expr, right: Expr):
+    return compute(left) * compute(right)
+
+@method
+def compute_op(op: Literal("/"), left: Expr, right: Expr):
+    return compute(left) / compute(right)
 
 e = ["+", 2, ["*", 3, 4]]
 print(compute(e))
